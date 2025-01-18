@@ -1,4 +1,5 @@
 ﻿using AppData.DbContexts;
+using AppData.Dto;
 using AppData.IRepositories;
 using AppData.Models;
 using Microsoft.EntityFrameworkCore;
@@ -19,35 +20,135 @@ namespace AppData.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        public async Task<ApiResponse> GetCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync();
-        }
-
-        public async Task<Category?> GetCategoryByIdAsync(Guid id)
-        {
-            return await _context.Categories.FindAsync(id);
-        }
-
-        public async Task AddCategoryAsync(Category category)
-        {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateCategoryAsync(Category category)
-        {
-            _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteCategoryAsync(Guid id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            try
             {
-                _context.Categories.Remove(category);
+                var categories = await _context.Categories.ToListAsync();
+                return new ApiResponse
+                {
+                    Data = categories,
+                    Status = 200,
+                    Message = "Success"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse
+                {
+                    Data = null,
+                    Status = 500,
+                    Message = "Internal server error"
+                };
+            }
+        }
+
+        public async Task<ApiResponse> GetCategoryByIdAsync(Guid id)
+        {
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                List<Category> categories = new List<Category>();
+                if (category != null)
+                {
+                    categories.Add(category);
+                    return new ApiResponse
+                    {
+                        Data = categories,
+                        Status = 200,
+                        Message = "Success"
+                    };
+                }
+                return new ApiResponse
+                {
+                    Data = null,
+                    Status = 404,
+                    Message = "Category not found"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse
+                {
+                    Data = null,
+                    Status = 500,
+                    Message = "Internal server error"
+                };
+            }
+        }
+
+        public async Task<ApiResponse> AddCategoryAsync(Category category)
+        {
+            try
+            {
+                _context.Categories.Add(category);
                 await _context.SaveChangesAsync();
+                return new ApiResponse
+                {
+                    Status = 200,
+                    Message = "Add category successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse
+                {
+                    Status = 500,
+                    Message = "Internal server error"
+                };
+            }
+        }
+
+        public async Task<ApiResponse> UpdateCategoryAsync(Category category)
+        {
+            try
+            {
+                _context.Categories.Update(category);
+                await _context.SaveChangesAsync();
+                return new ApiResponse
+                {
+                    Status = 200,
+                    Message = "Update category successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse
+                {
+                    Status = 500,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResponse> DeleteCategoryAsync(Guid id)
+        {
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category != null)
+                {
+                    _context.Categories.Remove(category);
+                    await _context.SaveChangesAsync();
+                    return new ApiResponse
+                    {
+                        Status = 200,
+                        Message = "Delete category successfully"
+                    };
+                }
+                return new ApiResponse
+                {
+                    Status = 404,
+                    Message = "Category not found"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse
+                {
+                    Status = 500,
+                    Message = "Internal server error"
+                };
             }
         }
     }

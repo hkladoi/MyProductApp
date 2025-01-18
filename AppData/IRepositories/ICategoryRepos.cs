@@ -1,4 +1,5 @@
-﻿using AppData.Models;
+﻿using AppData.Dto;
+using AppData.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace AppData.IRepositories
 {
     public interface ICategoryRepos
     {
-        Task<IEnumerable<Category>> GetCategoriesAsync();
-        Task<Category?> GetCategoryByIdAsync(Guid id);
-        Task AddCategoryAsync(Category category);
-        Task UpdateCategoryAsync(Category category);
-        Task DeleteCategoryAsync(Guid id);
+        Task<ApiResponse> GetCategoriesAsync();
+        Task<ApiResponse> GetCategoryByIdAsync(Guid id);
+        Task<ApiResponse> AddCategoryAsync(Category category);
+        Task<ApiResponse> UpdateCategoryAsync(Category category);
+        Task<ApiResponse> DeleteCategoryAsync(Guid id);
 
     }
 }

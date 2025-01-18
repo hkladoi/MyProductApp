@@ -1,4 +1,5 @@
 ﻿using AppData.DbContexts;
+using AppData.Dto;
 using AppData.IRepositories;
 using AppData.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +21,13 @@ namespace AppData.Repositories
         public async Task<IEnumerable<object>> GetProductsAsync()
         {
             return await _context.Products
-                .Select(p => new
+                .Select(p => new ProductRespone
                 {
-                    p.Id,
-                    p.Name,
-                    p.Price,
-                    CategoryNames = p.ProductDetails.Select(pc => pc.Category.Name),
-                    p.ImportDate
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    Category_Name = string.Join(", ", p.ProductDetails.Select(pc => pc.Category.Name)),
+                    ImportDate = p.ImportDate
                 })
                 .ToListAsync();
         }

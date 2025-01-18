@@ -1,10 +1,10 @@
-﻿@model IEnumerable<AppData.Models.Product>
+﻿@model IEnumerable<AppData.Models.Category>
 
 @{
-    ViewData["Title"] = "ListProduct";
+    ViewData["Title"] = "Index";
 }
 
-<h1>ListProduct</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -14,9 +14,6 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ImportDate)
@@ -29,9 +26,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ImportDate)

@@ -23,40 +23,39 @@ namespace AppApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<object> GetCategories()
         {
             var categories = await _categoryRepository.GetCategoriesAsync();
-            return Ok(categories);
+            return categories;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCategoryById(Guid id)
+        public async Task<object> GetCategoryById(Guid id)
         {
             var category = await _categoryRepository.GetCategoryByIdAsync(id);
             if (category == null) return NotFound();
-            return Ok(category);
+            return category;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] Category category)
+        public async Task<object> AddCategory([FromBody] Category category)
         {
-            await _categoryRepository.AddCategoryAsync(category);
-            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
+            var response = await _categoryRepository.AddCategoryAsync(category);
+            return response;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] Category category)
+        [HttpPut]
+        public async Task<object> UpdateCategory([FromBody] Category category)
         {
-            if (id != category.Id) return BadRequest();
-            await _categoryRepository.UpdateCategoryAsync(category);
-            return NoContent();
+            var response = await _categoryRepository.UpdateCategoryAsync(category);
+            return response;
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        public async Task<object> DeleteCategory(Guid id)
         {
-            await _categoryRepository.DeleteCategoryAsync(id);
-            return NoContent();
+            var response = await _categoryRepository.DeleteCategoryAsync(id);
+            return response;
         }
     }
 }
