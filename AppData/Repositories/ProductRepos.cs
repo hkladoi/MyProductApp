@@ -25,7 +25,7 @@ namespace AppData.Repositories
                     p.Id,
                     p.Name,
                     p.Price,
-                    CategoryNames = p.ProductDetails.Select(pc => pc.ProductCategory.Name),
+                    CategoryNames = p.ProductDetails.Select(pc => pc.Category.Name),
                     p.ImportDate
                 })
                 .ToListAsync();
@@ -35,7 +35,7 @@ namespace AppData.Repositories
         {
             return await _context.Products
                 .Include(p => p.ProductDetails)
-                .ThenInclude(pc => pc.ProductCategory)
+                .ThenInclude(pc => pc.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

@@ -20,7 +20,7 @@ namespace AppData.DbContexts
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<ProductDetail> ProductDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,7 +35,7 @@ namespace AppData.DbContexts
                 .HasForeignKey(ppc => ppc.ProductId);
 
             modelBuilder.Entity<ProductDetail>()
-                .HasOne(ppc => ppc.ProductCategory)
+                .HasOne(ppc => ppc.Category)
                 .WithMany(pc => pc.ProductDetails)
                 .HasForeignKey(ppc => ppc.ProductCategoryId);
             modelBuilder.

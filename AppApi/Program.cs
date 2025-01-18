@@ -14,7 +14,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  // Use appropriate DB provider
 builder.Services.AddScoped<IProductRepos, ProductRepos>();
-builder.Services.AddScoped<IProductCategoryRepos, ProductCategoryRepos>();
+builder.Services.AddScoped<ICategoryRepos, CategoryRepos>();
+builder.Services.AddScoped<IProductDetails, ProductDetailRepos>();
 
 var app = builder.Build();
 app.UseSwaggerUI(options =>

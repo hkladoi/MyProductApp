@@ -15,9 +15,9 @@ namespace AppApi.Controllers
     [ApiController]
     public class ProductCategoriesController : ControllerBase
     {
-        private readonly IProductCategoryRepos _categoryRepository;
+        private readonly ICategoryRepos _categoryRepository;
 
-        public ProductCategoriesController(IProductCategoryRepos categoryRepository)
+        public ProductCategoriesController(ICategoryRepos categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }
@@ -38,14 +38,14 @@ namespace AppApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] ProductCategory category)
+        public async Task<IActionResult> AddCategory([FromBody] Category category)
         {
             await _categoryRepository.AddCategoryAsync(category);
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] ProductCategory category)
+        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] Category category)
         {
             if (id != category.Id) return BadRequest();
             await _categoryRepository.UpdateCategoryAsync(category);

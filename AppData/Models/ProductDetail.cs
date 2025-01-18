@@ -12,6 +12,6 @@ namespace AppData.Models
         public Guid ProductId { get; set; }
         public Product? Product { get; set; }
         public Guid ProductCategoryId { get; set; }
-        public ProductCategory? ProductCategory { get; set; }
+        public Category? Category { get; set; }
     }
 }
