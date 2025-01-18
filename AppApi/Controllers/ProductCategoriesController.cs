@@ -15,48 +15,47 @@ namespace AppApi.Controllers
     [ApiController]
     public class ProductCategoriesController : ControllerBase
     {
-        private readonly IProductCategoryRepos _categoryRepository;
+        private readonly ICategoryRepos _categoryRepository;
 
-        public ProductCategoriesController(IProductCategoryRepos categoryRepository)
+        public ProductCategoriesController(ICategoryRepos categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<object> GetCategories(string? keyword)
         {
-            var categories = await _categoryRepository.GetCategoriesAsync();
-            return Ok(categories);
+            var categories = await _categoryRepository.GetCategoriesAsync(keyword);
+            return categories;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCategoryById(Guid id)
+        public async Task<object> GetCategoryById(Guid id)
         {
             var category = await _categoryRepository.GetCategoryByIdAsync(id);
             if (category == null) return NotFound();
-            return Ok(category);
+            return category;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] ProductCategory category)
+        public async Task<object> AddCategory([FromBody] Category category)
         {
-            await _categoryRepository.AddCategoryAsync(category);
-            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
+            var response = await _categoryRepository.AddCategoryAsync(category);
+            return response;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] ProductCategory category)
+        [HttpPut]
+        public async Task<object> UpdateCategory([FromBody] Category category)
         {
-            if (id != category.Id) return BadRequest();
-            await _categoryRepository.UpdateCategoryAsync(category);
-            return NoContent();
+            var response = await _categoryRepository.UpdateCategoryAsync(category);
+            return response;
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        public async Task<object> DeleteCategory(Guid id)
         {
-            await _categoryRepository.DeleteCategoryAsync(id);
-            return NoContent();
+            var response = await _categoryRepository.DeleteCategoryAsync(id);
+            return response;
         }
     }
 }

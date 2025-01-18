@@ -11,21 +11,21 @@ namespace AppData.DbContexts
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            if (!context.ProductCategories.Any())
+            if (!context.Categories.Any())
             {
-                var categories = Enumerable.Range(1, 20).Select(i => new ProductCategory
+                var categories = Enumerable.Range(1, 20).Select(i => new Category
                 {
                     Name = $"Category {i}",
                     ImportDate = DateTime.Now
                 }).ToList();
-                context.ProductCategories.AddRange(categories);
+                context.Categories.AddRange(categories);
                 await context.SaveChangesAsync();
             }
 
             if (!context.Products.Any())
             {
                 var random = new Random();
-                var categories = context.ProductCategories.ToList();
+                var categories = context.Categories.ToList();
 
                 var products = Enumerable.Range(1, 10000).Select(i => new Product
                 {

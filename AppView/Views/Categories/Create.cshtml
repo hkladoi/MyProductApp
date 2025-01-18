@@ -1,0 +1,81 @@
+﻿@model AppData.Models.Category
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Category</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="createForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" id="category_name"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImportDate" class="control-label"></label>
+                <input asp-for="ImportDate" class="form-control" id="category_date" />
+                <span asp-validation-for="ImportDate" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="margin-top:10px">
+                <button type="button" id="btnCreate" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#btnCreate').on('click', function (e) {
+                e.preventDefault();
+
+                const categoryData = {
+                    name: $('#category_name').val(),
+                    importDate: $('#category_date').val(),
+                };
+
+                if (!categoryData.name || !categoryData.importDate) {
+                    alert('Please fill all fields!');
+                    return;
+                }
+                $.ajax({
+                    url: 'https://localhost:7138/api/ProductCategories',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(categoryData),
+                    success: function (response) {
+                        if (response.status === 200) {
+                            alert(response.message);
+                            setTimeout(function () {
+                                window.location.href = '/Categories';
+                            }, 500);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                error: function (xhr, status, error) {
+                console.error('Status: ', status);
+                console.error('Error: ', error);
+                console.error('Response: ', xhr.responseText);
+                alert(`Error ${xhr.status}: ${xhr.statusText}`);
+            }
+                });
+            });
+        });
+    </script>
+}

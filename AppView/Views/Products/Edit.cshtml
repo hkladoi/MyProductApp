@@ -1,0 +1,204 @@
+﻿@model AppData.Dto.ProductDetailDto
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="editForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" id="productId" value="@ViewData["ProductId"]" />
+            <input type="hidden" id="categoryId" value="@ViewData["CategoryId"]" />
+
+
+            <div class="form-group">
+                <label asp-for="product_name" class="control-label"></label>
+                <input asp-for="product_name" class="form-control" id="product_name" />
+                <span asp-validation-for="product_name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="product_price" class="control-label"></label>
+                <input asp-for="product_price" class="form-control" id="product_price" />
+                <span asp-validation-for="product_price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="import_day" class="control-label"></label>
+                <input asp-for="import_day" class="form-control" id="import_day" />
+                <span asp-validation-for="import_day" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="categoryText">Categories Selected</label>
+                <input type="text" id="categoryText" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="categoryDropdown" class="form-control">
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top:10px">
+                <button type="button" id="btnSave" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            var categoryDropdown = $('#categoryDropdown');
+
+            // Lấy danh mục từ API
+            $.ajax({
+                url: 'https://localhost:7138/api/ProductCategories',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 200) {
+                        var categories = response.data;
+                        categoryDropdown.empty(); // Xóa các option cũ
+
+                        // Thêm một option mặc định
+                        categoryDropdown.append('<option value="default">Select Category</option>');
+
+                        // Thêm các category vào dropdown
+                        categories.forEach(function(category) {
+                            categoryDropdown.append('<option>' + category.name + '</option>');
+                        });
+
+                        // Sau khi danh mục được tải xong, tải dữ liệu sản phẩm
+                        loadProductData();
+                    } else {
+                        alert('Failed to load categories');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error fetching categories: ' + error);
+                }
+            });
+
+            // Hàm tải dữ liệu sản phẩm
+            function loadProductData() {
+                var productId = $('#productId').val();
+                var categoryId = $('#categoryId').val();
+
+                $.ajax({
+                    url: `https://localhost:7138/api/ProductDetails/${productId}/${categoryId}`,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.status === 200) {
+                            var product = response.data[0];
+                            var importDay = new Date(product.import_day);
+                            var formattedImportDay = importDay.toISOString().slice(0, 16); // Lấy phần ngày và giờ, không lấy phần giây và múi giờ
+                            // Điền dữ liệu vào form
+                            $('#product_name').val(product.product_name);
+                            $('#product_price').val(product.product_price);
+                            $('#import_day').val(formattedImportDay);
+
+                            // Điền giá trị của categoryText
+                            $('#categoryText').val(product.category);
+
+                        } else {
+                            alert("Không thể tải dữ liệu sản phẩm.");
+                        }
+                    },
+                    error: function() {
+                        alert("Không thể tải dữ liệu sản phẩm.");
+                    }
+                });
+            }
+
+            // Xử lý chọn danh mục từ dropdown
+            categoryDropdown.on('change', function() {
+                var selectedCategory = categoryDropdown.val();
+                var categoryText = $('#categoryText');
+
+                // Lấy các giá trị hiện tại trong ô text
+                var currentValue = categoryText.val();
+
+                // Kiểm tra xem đã có giá trị trong ô text chưa, nếu có thì thêm dấu ", "
+                if (currentValue) {
+                    categoryText.val(currentValue + ', ' + selectedCategory);
+                } else {
+                    categoryText.val(selectedCategory);
+                }
+                categoryDropdown.val('default');
+            });
+
+            // Xử lý save thông tin sản phẩm
+            $('#btnSave').on('click', function (e) {
+                e.preventDefault();
+
+                const productData = {
+                    product_id: $('#productId').val(),
+                    category_id: $('#categoryId').val(),
+                    product_name: $('#product_name').val(),
+                    product_price: $('#product_price').val(),
+                    import_day: $('#import_day').val(),
+                    category: $('#categoryText').val()
+                };
+
+                // Kiểm tra nếu có trường rỗng và hiển thị thông báo yêu cầu nhập
+                if (!productData.product_name) {
+                    alert("Vui lòng nhập tên sản phẩm!");
+                    return;
+                }
+                if (isNaN(productData.product_price) || productData.product_price <= 0) {
+                    alert("Vui lòng nhập giá sản phẩm hợp lệ!");
+                    return;
+                }
+                if (!productData.import_day) {
+                    alert("Vui lòng chọn ngày nhập!");
+                    return;
+                }
+                if (!productData.category) {
+                    alert("Vui lòng chọn danh mục!");
+                    return;
+                }
+
+                // Gửi dữ liệu lên API để update
+                $.ajax({
+                    url: 'https://localhost:7138/api/ProductDetails/',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productData),
+                    success: function (response) {
+                        if (response.status === 200) {
+                            alert(response.message);
+                            setTimeout(function () {
+                                window.location.href = '/Products'; // Điều hướng về danh sách sản phẩm
+                            }, 500);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Status: ', status);
+                        console.error('Error: ', error);
+                        console.error('Response: ', xhr.responseText);
+                        alert(`Error ${xhr.status}: ${xhr.statusText}`);
+                    }
+                });
+            });
+        });
+    </script>
+}

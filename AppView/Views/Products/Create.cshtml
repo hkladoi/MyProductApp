@@ -1,0 +1,153 @@
+﻿@model AppData.Dto.ProductDetailDto
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="createForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="product_name" class="control-label"></label>
+                <input asp-for="product_name" class="form-control" id="product_name" />
+                <span asp-validation-for="product_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="product_price" class="control-label"></label>
+                <input asp-for="product_price" class="form-control" id="product_price" />
+                <span asp-validation-for="product_price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="import_day" class="control-label"></label>
+                <input asp-for="import_day" class="form-control" id="import_day" />
+                <span asp-validation-for="import_day" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="categoryText">Categories Selected</label>
+                <input type="text" id="categoryText" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="categoryDropdown" class="form-control">
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:10px">
+                <button type="button" id="btnCreate" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+                    var categoryDropdown = $('#categoryDropdown');
+
+                $.ajax({
+                    url: 'https://localhost:7138/api/ProductCategories', 
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 200) {
+                    var categories = response.data;
+                    categoryDropdown.empty(); // Xóa các option cũ
+
+                    // Thêm một option mặc định
+                    categoryDropdown.append('<option value="default">Select Category</option>');
+
+                    // Thêm các category vào dropdown
+                    categories.forEach(function(category) {
+                        categoryDropdown.append('<option>' + category.name + '</option>');
+                    });
+                } else {
+                    alert('Failed to load categories');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error fetching categories: ' + error);
+            }
+        });
+
+                categoryDropdown.on('change', function() {
+            var selectedCategory = categoryDropdown.val();
+            var categoryText = $('#categoryText');
+
+            // Lấy các giá trị hiện tại trong ô text
+            var currentValue = categoryText.val();
+
+            // Kiểm tra xem đã có giá trị trong ô text chưa, nếu có thì thêm dấu ", "
+            if (currentValue) {
+                categoryText.val(currentValue + ', ' + selectedCategory);
+            } else {
+                categoryText.val(selectedCategory);
+            }
+            categoryDropdown.val('default');
+        });
+
+            $('#btnCreate').on('click', function (e) {
+                e.preventDefault();
+
+                                const productData = {
+                    product_name: $('#product_name').val(),
+                    product_price: $('#product_price').val(),
+                    import_day: $('#import_day').val(),
+                    category: $('#categoryText').val()
+                };
+
+            if (!productData.product_name) {
+            alert("Vui lòng nhập tên sản phẩm!");
+            return; 
+        }
+        if (isNaN(productData.product_price) || productData.product_price <= 0) {
+            alert("Vui lòng nhập giá sản phẩm hợp lệ!");
+            return;
+        }
+        if (!productData.import_day) {
+            alert("Vui lòng chọn ngày nhập!");
+            return;
+        }
+        if (!productData.category) {
+            alert("Vui lòng chọn danh mục!");
+            return;
+        }
+
+                $.ajax({
+                    url: 'https://localhost:7138/api/ProductDetails',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productData),
+                    success: function (response) {
+                        if (response.status === 200) {
+                            alert(response.message); 
+                            setTimeout(function () {
+                                window.location.href = '/Products'; 
+                            }, 500);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                error: function (xhr, status, error) {
+                console.error('Status: ', status);
+                console.error('Error: ', error);
+                console.error('Response: ', xhr.responseText);
+                alert(`Error ${xhr.status}: ${xhr.statusText}`);
+            }
+                });
+            });
+        });
+    </script>
+}

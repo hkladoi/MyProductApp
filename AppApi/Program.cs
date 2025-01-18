@@ -13,10 +13,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  // Use appropriate DB provider
-builder.Services.AddScoped<IProductRepos, ProductRepos>();
-builder.Services.AddScoped<IProductCategoryRepos, ProductCategoryRepos>();
-
+builder.Services.AddScoped<ICategoryRepos, CategoryRepos>();
+builder.Services.AddScoped<IProductDetailsRepos, ProductDetailRepos>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", policy =>
+    {
+        policy.WithOrigins("https://localhost:7057") 
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 var app = builder.Build();
+app.UseCors("AllowSpecificOrigins");
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "App");
