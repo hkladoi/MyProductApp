@@ -23,9 +23,9 @@ namespace AppApi.Controllers
         }
 
         [HttpGet]
-        public async Task<object> GetCategories()
+        public async Task<object> GetCategories(string? keyword)
         {
-            var categories = await _categoryRepository.GetCategoriesAsync();
+            var categories = await _categoryRepository.GetCategoriesAsync(keyword);
             return categories;
         }
 

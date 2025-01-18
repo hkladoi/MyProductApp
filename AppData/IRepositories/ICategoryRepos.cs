@@ -10,7 +10,7 @@ namespace AppData.IRepositories
 {
     public interface ICategoryRepos
     {
-        Task<ApiResponse> GetCategoriesAsync();
+        Task<ApiResponse> GetCategoriesAsync(string? keyword);
         Task<ApiResponse> GetCategoryByIdAsync(Guid id);
         Task<ApiResponse> AddCategoryAsync(Category category);
         Task<ApiResponse> UpdateCategoryAsync(Category category);

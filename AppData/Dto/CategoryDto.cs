@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AppData.Models
+namespace AppData.Dto
 {
-    public class Category
+    public class CategoryDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public DateTime ImportDate { get; set; }
-        public ICollection<ProductDetail>? ProductDetails { get; set; }
+        public int ProductCount { get; set; }
     }
 }

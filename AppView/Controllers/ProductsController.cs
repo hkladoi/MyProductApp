@@ -16,12 +16,10 @@ namespace AppView.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly AppDbContext _context;
         private HttpClient _client;
 
-        public ProductsController(AppDbContext context, HttpClient client)
+        public ProductsController(HttpClient client)
         {
-            _context = context;
             _client = client;
         }
 
@@ -43,44 +41,6 @@ namespace AppView.Controllers
             ViewData["ProductId"] = productId;
             ViewData["CategoryId"] = categoryId;
             return View();
-        }
-
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(Guid? id, Guid categoryId)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(Guid id)
-        {
-            return _context.Products.Any(e => e.Id == id);
         }
     }
 }

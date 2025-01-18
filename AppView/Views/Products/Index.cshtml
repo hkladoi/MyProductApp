@@ -2,7 +2,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Product</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -22,11 +22,12 @@
 <table class="table" id="productTable">
     <thead>
         <tr>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Import Day</th>
-            <th>Category</th>
-            <th>Actions</th>
+            <th>Id</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Tên Loại</th>
+            <th>Ngày nhập</th>
+            <th>Chức năng</th>
         </tr>
     </thead>
     <tbody id="productTableBody">
@@ -88,11 +89,11 @@
                         // Loop through each product and create a new table row
                         products.forEach(function (product) {
                             var row = `<tr>
+                                <td id="productId" value=${product.product_id}>${product.product_id}</td>
                                 <td>${product.product_name}</td>
                                 <td>${product.product_price}</td>
-                                <td>${new Date(product.import_day).toLocaleString()}</td>
                                 <td>${product.category}</td>
-                                <input type="hidden" id="productId" value=${product.product_id} />
+                                <td>${new Date(product.import_day).toLocaleString()}</td>
                                 <input type="hidden" id="categoryId" value=${product.category_id} />
                                 <td>
                                     <a href="/Products/Edit?productId=${product.product_id}&categoryId=${product.category_id}">Edit</a> |

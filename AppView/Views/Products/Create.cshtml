@@ -102,7 +102,6 @@
                 e.preventDefault();
 
                                 const productData = {
-                    id: $('#productId').val(),
                     product_name: $('#product_name').val(),
                     product_price: $('#product_price').val(),
                     import_day: $('#import_day').val(),
@@ -126,7 +125,6 @@
             return;
         }
 
-                console.log(productData);
                 $.ajax({
                     url: 'https://localhost:7138/api/ProductDetails',
                     type: 'POST',

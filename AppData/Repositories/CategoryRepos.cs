@@ -20,11 +20,28 @@ namespace AppData.Repositories
             _context = context;
         }
 
-        public async Task<ApiResponse> GetCategoriesAsync()
+        public async Task<ApiResponse> GetCategoriesAsync(string? keyword)
         {
             try
             {
-                var categories = await _context.Categories.ToListAsync();
+                List<CategoryDto> categories = new List<CategoryDto>();
+                var query = _context.Categories.AsQueryable();
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(p => p.Name.Contains(keyword));
+                }
+                var data = await query.ToListAsync();
+                foreach (var item in data)
+                {
+                    var productCount = await _context.ProductDetails.Where(p => p.ProductCategoryId == item.Id).CountAsync();
+                    categories.Add(new CategoryDto
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        ImportDate = item.ImportDate,
+                        ProductCount = productCount
+                    });
+                }
                 return new ApiResponse
                 {
                     Data = categories,
@@ -81,6 +98,21 @@ namespace AppData.Repositories
         {
             try
             {
+                var checkCategory = await _context.Categories.FirstOrDefaultAsync(p => p.Name == category.Name);
+                if (checkCategory != null)
+                {
+                    return new ApiResponse
+                    {
+                        Status = 400,
+                        Message = "Category already exists"
+                    };
+                }
+                category = new Category
+                {
+                    Id = Guid.NewGuid(),
+                    Name = category.Name,
+                    ImportDate = category.ImportDate,
+                };
                 _context.Categories.Add(category);
                 await _context.SaveChangesAsync();
                 return new ApiResponse
@@ -103,7 +135,19 @@ namespace AppData.Repositories
         {
             try
             {
-                _context.Categories.Update(category);
+                var checkCategory = await _context.Categories.FirstOrDefaultAsync(p => p.Id == category.Id);
+                if (checkCategory == null)
+                {
+                    return new ApiResponse
+                    {
+                        Status = 400,
+                        Message = "Category not found"
+                    };
+                }
+                checkCategory.Id = category.Id;
+                checkCategory.Name = category.Name;
+                checkCategory.ImportDate = category.ImportDate;
+                _context.Categories.Update(checkCategory);
                 await _context.SaveChangesAsync();
                 return new ApiResponse
                 {
@@ -126,6 +170,15 @@ namespace AppData.Repositories
             try
             {
                 var category = await _context.Categories.FindAsync(id);
+                var productCount = await _context.ProductDetails.Where(p => p.ProductCategoryId == id).CountAsync();
+                if (productCount > 0)
+                {
+                    return new ApiResponse
+                    {
+                        Status = 400,
+                        Message = "Category has product"
+                    };
+                }
                 if (category != null)
                 {
                     _context.Categories.Remove(category);
